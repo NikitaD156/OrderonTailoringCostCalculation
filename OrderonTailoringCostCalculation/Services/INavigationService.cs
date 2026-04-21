@@ -20,6 +20,5 @@ namespace OrderonTailoringCostCalculation.Services
         /// <summary>Переход на корневую страницу (очистка стека).</summary>
         Task GoToRootAsync();
 
-        INavigation GetCurrentNavigation();
     }
 }

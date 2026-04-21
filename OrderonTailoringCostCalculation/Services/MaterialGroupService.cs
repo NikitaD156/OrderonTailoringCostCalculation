@@ -1,12 +1,12 @@
-﻿using OrderonTailoringCostCalculation.Models;
-using SQLite;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using OrderonTailoringCostCalculation.Models;
+using SQLite;
 
 namespace OrderonTailoringCostCalculation.Services
 {
-    public class DiscountService
+    public class MaterialGroupService
     {
         SQLiteAsyncConnection database;
 
@@ -17,26 +17,26 @@ namespace OrderonTailoringCostCalculation.Services
                 return;
             }
             database = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
-            var result = await database.CreateTableAsync<Discount>();
+            var result = await database.CreateTableAsync<MaterialGroup>();
         }
+        private List<MaterialGroup> _materialGroup = new List<MaterialGroup>();
 
-        private List<Discount> _discount = new List<Discount>();
+        public IReadOnlyList<MaterialGroup> MaterialGroups => _materialGroup.AsReadOnly();
 
-        public IReadOnlyList<Discount> Discounts => _discount.AsReadOnly();
-
-        public async Task<List<Discount>> GetItemsAsync()
+        public async Task<List<MaterialGroup>> GetItemsAsync()
         {
             await Init();
-            return _discount = await database.Table<Discount>().ToListAsync();
+            return _materialGroup = await database.Table<MaterialGroup>().ToListAsync();
+
         }
 
-        public async Task<Discount> GetItemAsync(int id)
+        public async Task<MaterialGroup> GetItemAsync(int id)
         {
             await Init();
-            return await database.Table<Discount>().Where(i => i.ID == id).FirstOrDefaultAsync();
+            return await database.Table<MaterialGroup>().Where(i => i.ID == id).FirstOrDefaultAsync();
         }
 
-        public async Task<int> SaveItemAsync(Discount item)
+        public async Task<int> SaveItemAsync(MaterialGroup item)
         {
             await Init();
             if (item.ID != 0)
@@ -49,7 +49,7 @@ namespace OrderonTailoringCostCalculation.Services
             }
         }
 
-        public async Task<int> DeleteItemAsync(Discount item)
+        public async Task<int> DeleteItemAsync(MaterialGroup item)
         {
             await Init();
             return await database.DeleteAsync(item);

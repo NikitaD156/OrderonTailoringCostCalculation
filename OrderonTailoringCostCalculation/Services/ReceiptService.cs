@@ -29,8 +29,9 @@ namespace OrderonTailoringCostCalculation.Services
         public async Task<List<Receipt>> GetItemsAsync()
         {
             await Init();
-            return _receipts = await database.Table<Receipt>().ToListAsync();
-            
+            _receipts = await database.Table<Receipt>().ToListAsync();
+            _receipts.Reverse();
+            return _receipts;
         }
 
         public async Task<Receipt> GetItemAsync(int id)
@@ -49,10 +50,13 @@ namespace OrderonTailoringCostCalculation.Services
             
             var garment = await database.Table<MinValueGarment>().Where(g => g.ID == receipt.MinValueGarmentID).FirstOrDefaultAsync();
 
+            var material = await database.Table<MaterialGroup>().Where(m => m.ID == receipt.MaterialGroupID).FirstOrDefaultAsync();
+
             return new ReceiptDetails
             {
                 Receipt = receipt,
-                MinValueGarment = garment
+                MinValueGarment = garment,
+                MaterialGroup = material
             };
         }
 
@@ -61,11 +65,13 @@ namespace OrderonTailoringCostCalculation.Services
             await Init();
             if (item.ID != 0)
             {
-                return await database.UpdateAsync(item);
+                await database.UpdateAsync(item);
+                return item.ID;
             }
             else
             {
-                return await database.InsertAsync(item);
+                await database.InsertAsync(item);
+                return item.ID;
             }
         }
 

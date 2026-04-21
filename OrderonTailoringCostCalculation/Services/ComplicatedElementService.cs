@@ -19,10 +19,15 @@ namespace OrderonTailoringCostCalculation.Services
             database = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
             var result = await database.CreateTableAsync<ComplicatedElement>();
         }
+
+        private List<ComplicatedElement> _complicatedElement = new List<ComplicatedElement>();
+
+        public IReadOnlyList<ComplicatedElement> ComplicatedElements => _complicatedElement.AsReadOnly();
+
         public async Task<List<ComplicatedElement>> GetItemsAsync()
         {
             await Init();
-            return await database.Table<ComplicatedElement>().ToListAsync();
+            return _complicatedElement = await database.Table<ComplicatedElement>().ToListAsync();
         }
 
         public async Task<ComplicatedElement> GetItemAsync(int id)

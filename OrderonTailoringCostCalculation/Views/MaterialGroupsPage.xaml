@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="OrderonTailoringCostCalculation.Views.MaterialGroupsPage"
+             xmlns:models="clr-namespace:OrderonTailoringCostCalculation.Models"
+             xmlns:viewModels="clr-namespace:OrderonTailoringCostCalculation.ViewModels"
+             x:DataType="viewModels:MaterialGroupsViewModel"
+             Title="Выберите группу">
+    <CollectionView ItemsSource="{Binding MaterialGroups}" SelectionChangedCommand="{Binding SelectedGroupChangedCommand}" SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}" SelectedItem="{Binding SelectedMaterialGroup, Mode=TwoWay}" SelectionMode="Single">
+        <CollectionView.ItemTemplate>
+            <DataTemplate x:DataType="models:MaterialGroup">
+                <Grid>
+                    <Border>
+                        <Label Text="{Binding Description}"/>
+                    </Border>
+                </Grid>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+    </CollectionView>
+
+</ContentPage>

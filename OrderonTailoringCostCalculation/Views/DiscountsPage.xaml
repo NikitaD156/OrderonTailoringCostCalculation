@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="OrderonTailoringCostCalculation.Views.DiscountsPage"
+             xmlns:models="clr-namespace:OrderonTailoringCostCalculation.Models"
+             xmlns:viewModels="clr-namespace:OrderonTailoringCostCalculation.ViewModels"
+             x:DataType="viewModels:DiscountsViewModel"
+             Title="Выберите скидку">
+
+    <CollectionView ItemsSource="{Binding Discounts}" SelectionChangedCommand="{Binding DiscountSelectedCommand}" SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}" SelectedItem="{Binding SelectedDiscount, Mode=TwoWay}" SelectionMode="Single">
+        <CollectionView.ItemTemplate>
+            <DataTemplate x:DataType="models:Discount">
+                <Grid>
+                    <Border>
+                        <Label Text="{Binding Name}"/>
+                    </Border>
+                </Grid>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+    </CollectionView>
+
+</ContentPage>

@@ -2,18 +2,19 @@ using OrderonTailoringCostCalculation.ViewModels;
 
 namespace OrderonTailoringCostCalculation.Views;
 
-public partial class ReceiptPage : ContentPage
+public partial class MinValueGarmentsPage : ContentPage
 {
-	public ReceiptPage(ReceiptDetailsViewModel receiptDetailsViewModel)
+	public MinValueGarmentsPage(MinValutGarmentsViewModel minValutGarmentsViewModel)
 	{
 		InitializeComponent();
 
-		BindingContext = receiptDetailsViewModel;
+		BindingContext = minValutGarmentsViewModel;
+
 	}
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        if (BindingContext is ReceiptDetailsViewModel viewModel)
+        if (BindingContext is MinValutGarmentsViewModel viewModel)
         {
             await viewModel.LoadAsync();
         }

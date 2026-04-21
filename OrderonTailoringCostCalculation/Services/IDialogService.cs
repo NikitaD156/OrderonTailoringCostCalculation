@@ -7,5 +7,6 @@ namespace OrderonTailoringCostCalculation.Services
     public interface IDialogService
     {
         Task ShowAlertAsync(string title, string message, string cancel);
+        Task<bool> ShowAlertAsync(string title, string accept, string message, string cancel);
     }
 }

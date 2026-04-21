@@ -15,6 +15,14 @@ namespace OrderonTailoringCostCalculation.ViewModels
 
         public int id => _receipt.ID;
 
+        public double minValue => _receipt.MinValue;
+
+        public double complicatedElementsValue => _receipt.ComplicatedElementsValue;
+
+        public double discountValue => _receipt.DiscountValue;
+
+        public double totalValue => _receipt.TotalValue;
+
         [ObservableProperty]
         private string displayMinValueGarmentName;
 

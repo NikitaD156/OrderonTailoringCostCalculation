@@ -2,18 +2,19 @@ using OrderonTailoringCostCalculation.ViewModels;
 
 namespace OrderonTailoringCostCalculation.Views;
 
-public partial class ReceiptPage : ContentPage
+public partial class MaterialGroupsPage : ContentPage
 {
-	public ReceiptPage(ReceiptDetailsViewModel receiptDetailsViewModel)
+	public MaterialGroupsPage(MaterialGroupsViewModel materialGroupsViewModel)
 	{
 		InitializeComponent();
 
-		BindingContext = receiptDetailsViewModel;
+        BindingContext = materialGroupsViewModel;
 	}
+
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        if (BindingContext is ReceiptDetailsViewModel viewModel)
+        if (BindingContext is MaterialGroupsViewModel viewModel)
         {
             await viewModel.LoadAsync();
         }

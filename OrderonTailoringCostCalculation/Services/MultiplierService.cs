@@ -6,7 +6,7 @@ using System.Text;
 
 namespace OrderonTailoringCostCalculation.Services
 {
-    public class DiscountService
+    public class MultiplierService
     {
         SQLiteAsyncConnection database;
 
@@ -17,26 +17,26 @@ namespace OrderonTailoringCostCalculation.Services
                 return;
             }
             database = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
-            var result = await database.CreateTableAsync<Discount>();
+            var result = await database.CreateTableAsync<Multiplier>();
         }
+        private List<Multiplier> _multiplier = new List<Multiplier>();
 
-        private List<Discount> _discount = new List<Discount>();
+        public IReadOnlyList<Multiplier> Multipliers => _multiplier.AsReadOnly();
 
-        public IReadOnlyList<Discount> Discounts => _discount.AsReadOnly();
-
-        public async Task<List<Discount>> GetItemsAsync()
+        public async Task<List<Multiplier>> GetItemsAsync()
         {
             await Init();
-            return _discount = await database.Table<Discount>().ToListAsync();
+            return _multiplier = await database.Table<Multiplier>().ToListAsync();
+
         }
 
-        public async Task<Discount> GetItemAsync(int id)
+        public async Task<Multiplier> GetItemAsync(int id)
         {
             await Init();
-            return await database.Table<Discount>().Where(i => i.ID == id).FirstOrDefaultAsync();
+            return await database.Table<Multiplier>().Where(i => i.ID == id).FirstOrDefaultAsync();
         }
 
-        public async Task<int> SaveItemAsync(Discount item)
+        public async Task<int> SaveItemAsync(Multiplier item)
         {
             await Init();
             if (item.ID != 0)
@@ -49,7 +49,7 @@ namespace OrderonTailoringCostCalculation.Services
             }
         }
 
-        public async Task<int> DeleteItemAsync(Discount item)
+        public async Task<int> DeleteItemAsync(Multiplier item)
         {
             await Init();
             return await database.DeleteAsync(item);

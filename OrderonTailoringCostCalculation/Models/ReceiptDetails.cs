@@ -8,5 +8,7 @@ namespace OrderonTailoringCostCalculation.Models
     {
         public Receipt Receipt { get; set; }
         public MinValueGarment MinValueGarment { get; set; }
+        public MaterialGroup MaterialGroup { get; set; }
+
     }
 }

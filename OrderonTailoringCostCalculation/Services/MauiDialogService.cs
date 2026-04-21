@@ -12,8 +12,18 @@ namespace OrderonTailoringCostCalculation.Services
             var page = Shell.Current ?? Application.Current?.MainPage;
             if (page == null)
                 throw new InvalidOperationException("Cannot display alert: no current page found.");
+        
+            return page.DisplayAlertAsync(title, message, cancel);
+        }
 
-            return page.DisplayAlert(title, message, cancel);
+        public Task<bool> ShowAlertAsync(string title, string message, string accept, string cancel)
+        {
+            // Пытаемся получить текущую страницу через Shell, если нет — через Application
+            var page = Shell.Current ?? Application.Current?.MainPage;
+            if (page == null)
+                throw new InvalidOperationException("Cannot display alert: no current page found.");
+            
+            return page.DisplayAlertAsync(title, message, accept, cancel);
         }
     }
 }

@@ -11,6 +11,7 @@ namespace OrderonTailoringCostCalculation.Models
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
         public int MinValueGarmentID { get; set; }
+        public int MaterialGroupID { get; set; }
         public double GroupCoefficient { get; set; }
         public int ConventionalUnitValue { get; set; }
         public int GarmentRatio { get; set; }

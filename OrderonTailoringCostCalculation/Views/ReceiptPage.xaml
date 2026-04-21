@@ -1,25 +1,74 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:OrderonTailoringCostCalculation.Models"
              xmlns:viewModels="clr-namespace:OrderonTailoringCostCalculation.ViewModels"
              x:Class="OrderonTailoringCostCalculation.Views.ReceiptPage"
              x:DataType="viewModels:ReceiptDetailsViewModel"
              Title="Чек">
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior Command="{Binding GoBackCommand}"/>
+    </Shell.BackButtonBehavior>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        <ScrollView>
+            <StackLayout Orientation="Vertical">
 
-        <Label Grid.Row="0" Grid.Column="0" Text="{Binding DisplayMinValueGarmentName}"/>
-        <Button Grid.Row="0" Grid.Column="1" Text="Добавить\Изменить основу изделия" Command="{Binding GoToGarmentsCommand}" LineBreakMode="WordWrap"/>
-        <Button Grid.Row="1" Grid.Column="0" Text="Сохранить" Command="{Binding SaveReceiptCommand}"/>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border>
+                        <Label HorizontalOptions="Center" VerticalOptions="Center" Text="{Binding DisplayMinValueGarmentName}"/>
+                    </Border>
+
+                    <Button Grid.Row="0" Grid.Column="1" Text="Добавить\Изменить основу изделия" Command="{Binding GoToGarmentsCommand}" LineBreakMode="WordWrap"/>
+                </Grid>
+
+                <CollectionView ItemsSource="{Binding ComplicatedElements}" IsVisible="{Binding IsComplElementButtonVisable}">
+                    <CollectionView.Header>
+                        <Button Text="Добавить усложняюищий элемент" Command="{Binding GoToComplicatedElementsCommand}" LineBreakMode="WordWrap"/>
+                    </CollectionView.Header>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:ComplicatedElement">
+                            <Grid>
+                                <Border>
+                                    <StackLayout>
+                                        <Label Text="{Binding Name}"/>
+                                        <Label Text="{Binding Description}"/>
+                                    </StackLayout>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <CollectionView ItemsSource="{Binding Discounts}" IsVisible="{Binding IsComplElementButtonVisable}">
+                    <CollectionView.Header>
+                        <Button Text="Добавить скидку/надбавку" Command="{Binding GoToDiscountsCommand}" LineBreakMode="WordWrap"/>
+                    </CollectionView.Header>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:Discount">
+                            <Grid>
+                                <Border>
+                                    <Label Text="{Binding Name}"/>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Button Text="Сохранить" Command="{Binding SaveAndExitCommand}"/>
+            </StackLayout>
+        </ScrollView>
     </Grid>
-    
+
 </ContentPage>

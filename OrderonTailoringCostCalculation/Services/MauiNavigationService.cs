@@ -34,11 +34,6 @@ namespace OrderonTailoringCostCalculation.Services
             return shell?.GoToAsync("//MainPage") ?? Task.CompletedTask;
         }
 
-        public INavigation GetCurrentNavigation()
-        {
-            return Application.Current?.Windows[0]?.Page?.Navigation
-                   ?? Shell.Current?.Navigation
-                   ?? throw new InvalidOperationException("Navigation not available");
-        }
+        
     }
 }

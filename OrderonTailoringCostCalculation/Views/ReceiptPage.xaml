@@ -20,17 +20,25 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="3*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-
+                    
                     <Border>
+                        <Label HorizontalOptions="Center" VerticalOptions="Center" Text="Условная стоимость одного часа работы: "/>
+                    </Border>
+                    
+                        <Entry Grid.Column="1" Text="{Binding CurrentConventionalUnitValue}"/>
+                   
+
+                    <Border Grid.Row="1">
                         <Label HorizontalOptions="Center" VerticalOptions="Center" Text="{Binding DisplayMinValueGarmentName}"/>
                     </Border>
 
-                    <Button Grid.Row="0" Grid.Column="1" Text="Добавить\Изменить основу изделия" Command="{Binding GoToGarmentsCommand}" LineBreakMode="WordWrap"/>
+                    <Button Grid.Row="1" Grid.Column="1" Text="Добавить\Изменить основу изделия" Command="{Binding GoToGarmentsCommand}" LineBreakMode="WordWrap"/>
                 </Grid>
 
                 <CollectionView ItemsSource="{Binding ComplicatedElements}" IsVisible="{Binding IsComplElementButtonVisable}">
@@ -66,7 +74,7 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
-                <Button Text="Сохранить" Command="{Binding SaveAndExitCommand}"/>
+                <Button Text="Сохранить" Command="{Binding SaveAndExitCommand}" IsVisible="{Binding IsComplElementButtonVisable}"/>
             </StackLayout>
         </ScrollView>
     </Grid>

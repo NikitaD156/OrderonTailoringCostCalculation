@@ -22,7 +22,6 @@ namespace OrderonTailoringCostCalculation
             builder.Services.AddSingleton<IDialogService, MauiDialogService>();
 
             builder.Services.AddTransient<ReceiptService>();
-            //builder.Services.AddTransient<MinValueGarmentService>();
 
             builder.Services.AddTransient<MainPage>();
             builder.Services.AddTransient<ReceiptsViewModel>();
@@ -39,9 +38,6 @@ namespace OrderonTailoringCostCalculation
 
             builder.Services.AddTransient<ComplicatedElementsPage>();
             builder.Services.AddTransient<ComplicatedElementsViewModel>();
-
-            builder.Services.AddTransient<ComplicatedElementsCount>();
-            builder.Services.AddTransient<ComplicatedElementsCountViewModel>();
 
             builder.Services.AddTransient<DiscountsPage>();
             builder.Services.AddTransient<DiscountsViewModel>();

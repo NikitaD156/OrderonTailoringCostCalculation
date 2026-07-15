@@ -8,8 +8,9 @@ namespace OrderonTailoringCostCalculation.Models
     [Table("ReceiptComplicatedElement")]
     public class ReceiptComplicatedElement
     {
+        [PrimaryKey, AutoIncrement]
+        public int ID { get; set; }
         public int ReceiptID { get; set; }
         public int ComplicatedElementID { get; set; }
-        public int Count { get; set; }
     }
 }

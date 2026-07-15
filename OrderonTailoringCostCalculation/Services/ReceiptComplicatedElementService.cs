@@ -20,21 +20,27 @@ namespace OrderonTailoringCostCalculation.Services
             var result = await database.CreateTableAsync<ReceiptComplicatedElement>();
         }
 
-        private List<ReceiptComplicatedElement> _receiptComplicatedElement = new List<ReceiptComplicatedElement>();
+        private List<ReceiptComplicatedElement> _receiptComplicatedElements = new List<ReceiptComplicatedElement>();
 
-        public IReadOnlyList<ReceiptComplicatedElement> ReceiptComplicatedElement => _receiptComplicatedElement.AsReadOnly();
+        public IReadOnlyList<ReceiptComplicatedElement> ReceiptComplicatedElements => _receiptComplicatedElements.AsReadOnly();
 
         public async Task<List<ReceiptComplicatedElement>> GetItemsAsync(int receiptID)
         {
             await Init();
-            return _receiptComplicatedElement = await database.Table<ReceiptComplicatedElement>().Where(i => i.ReceiptID == receiptID).ToListAsync();
+            return _receiptComplicatedElements = await database.Table<ReceiptComplicatedElement>().Where(i => i.ReceiptID == receiptID).ToListAsync();
         }
 
         public async Task<int> SaveItemAsync(ReceiptComplicatedElement item)
         {
             await Init();
-
-            return await database.InsertAsync(item);
+            if (item.ID != 0)
+            {
+                return await database.UpdateAsync(item);
+            }
+            else
+            {
+                return await database.InsertAsync(item);
+            }
 
         }
 

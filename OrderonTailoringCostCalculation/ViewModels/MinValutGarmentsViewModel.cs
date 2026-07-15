@@ -9,7 +9,7 @@ using System.Collections.ObjectModel;
 
 namespace OrderonTailoringCostCalculation.ViewModels
 {
-    [QueryProperty(nameof(SelectedGroupID), "groupID")]
+    [QueryProperty(nameof(CurrentConventionalUnitValue), "currentConventionalUnitValue")]
     public partial class MinValutGarmentsViewModel : ObservableObject
     {
         private readonly MinValueGarmentService _minValueGarmentService;
@@ -23,7 +23,7 @@ namespace OrderonTailoringCostCalculation.ViewModels
         private MinValueGarment selectedMinValueGarment;
 
         [ObservableProperty]
-        private int selectedGroupID;
+        private int currentConventionalUnitValue;
 
         public MinValutGarmentsViewModel(INavigationService navigationService)
         {
@@ -39,17 +39,12 @@ namespace OrderonTailoringCostCalculation.ViewModels
             {
                 var parameters = new Dictionary<string, object>
                 {
+                    ["currentConventionalUnitValue"] = CurrentConventionalUnitValue,
                     ["garmentID"] = value.ID
                 };
                 await _navigationService.GoToAsync("MaterialGroupsPage", parameters);
             }
         }
-
-        async partial void OnSelectedGroupIDChanged(int value)
-        {
-            
-        }
-        
 
         [RelayCommand]
         public async Task LoadAsync()

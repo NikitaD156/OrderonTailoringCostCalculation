@@ -9,5 +9,7 @@ namespace OrderonTailoringCostCalculation.Models
         public int MinValueGarmentID { get; set; }
 
         public int SelectedGroup { get; set; }
+
+        public int ConventionalUnitValue { get; set; }
     }
 }

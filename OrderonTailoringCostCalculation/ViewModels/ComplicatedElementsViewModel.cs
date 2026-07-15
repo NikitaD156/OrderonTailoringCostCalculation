@@ -12,9 +12,13 @@ namespace OrderonTailoringCostCalculation.ViewModels
     [QueryProperty(nameof(ReceiptID), "receiptID")]
     public partial class ComplicatedElementsViewModel : ObservableObject
     {
+        private readonly INavigationService _navigationService;
+
+        private readonly IDialogService _dialogService;
+
         private readonly ComplicatedElementService _complicatedElementService;
 
-        private readonly INavigationService _navigationService;
+        private readonly ReceiptComplicatedElementService _receiptComplicatedElementService;
 
         [ObservableProperty]
         private ObservableCollection<ComplicatedElement> complicatedElements;
@@ -25,11 +29,13 @@ namespace OrderonTailoringCostCalculation.ViewModels
         [ObservableProperty]
         private ComplicatedElement selectedComplicatedElement;
 
-        public ComplicatedElementsViewModel(INavigationService navigationService)
+        public ComplicatedElementsViewModel(INavigationService navigationService, IDialogService dialogService)
         {
+            _receiptComplicatedElementService = new ReceiptComplicatedElementService();
             _complicatedElementService = new ComplicatedElementService();
             complicatedElements = new ObservableCollection<ComplicatedElement>();
             _navigationService = navigationService;
+            _dialogService = dialogService;
         }
 
         [RelayCommand]
@@ -37,12 +43,31 @@ namespace OrderonTailoringCostCalculation.ViewModels
         {
             if (value != null)
             {
+                ReceiptComplicatedElement currentReceiptComplicatedElement = new ReceiptComplicatedElement();
+                currentReceiptComplicatedElement.ReceiptID = ReceiptID;
+                currentReceiptComplicatedElement.ComplicatedElementID = value.ID;
+
+                await _receiptComplicatedElementService.SaveItemAsync(currentReceiptComplicatedElement);
+
+                bool saved = true;
+
                 var parameters = new Dictionary<string, object>
                 {
-                    ["complicatedElementID"] = value.ID,
-                    ["receiptID"] = ReceiptID
+                    ["complicatedElementSaved"] = saved
                 };
-                await _navigationService.GoToAsync("ComplicatedElementsCount", parameters);
+                await _navigationService.GoToAsync("..", parameters);
+            }
+            else
+            {
+                bool b = await _dialogService.ShowAlertAsync("Количество Элементов = 0", "Да", "Вернутся к выбору элемента?", "Нет");
+                if (b)
+                {
+                    await _navigationService.GoBackAsync();
+                }
+                else
+                {
+                    return;
+                }
             }
         }
 

@@ -9,6 +9,7 @@ using System.Text;
 
 namespace OrderonTailoringCostCalculation.ViewModels
 {
+    [QueryProperty(nameof(CurrentConventionalUnitValue), "currentConventionalUnitValue")]
     [QueryProperty(nameof(SelectedMinValueGarmentID), "garmentID")]
     public partial class MaterialGroupsViewModel : ObservableObject
     {
@@ -21,6 +22,9 @@ namespace OrderonTailoringCostCalculation.ViewModels
 
         [ObservableProperty]
         private ObservableCollection<MaterialGroup> materialGroups;
+
+        [ObservableProperty]
+        private int currentConventionalUnitValue;
 
         [ObservableProperty]
         private MaterialGroup selectedMaterialGroup;
@@ -40,6 +44,7 @@ namespace OrderonTailoringCostCalculation.ViewModels
                 MinValueGarmentIDWithSelectedGroup minValueGarmentIDWithSelectedGroup = new();
                 minValueGarmentIDWithSelectedGroup.MinValueGarmentID = SelectedMinValueGarmentID;
                 minValueGarmentIDWithSelectedGroup.SelectedGroup = value.ID;
+                minValueGarmentIDWithSelectedGroup.ConventionalUnitValue = CurrentConventionalUnitValue;
                 var parameters = new Dictionary<string, object>
                 {
                     ["garmentIDandGroup"] = minValueGarmentIDWithSelectedGroup

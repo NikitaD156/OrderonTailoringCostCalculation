@@ -23,6 +23,8 @@ namespace OrderonTailoringCostCalculation.ViewModels
 
         private readonly ReceiptService _receiptService = new();
 
+        private readonly MinValueGarmentService _minValueGarmentService = new();
+
         private readonly ReceiptComplicatedElementService _receiptComplicatedElementService = new();
 
         private readonly ComplicatedElementService _complicatedElementService = new();
@@ -54,6 +56,8 @@ namespace OrderonTailoringCostCalculation.ViewModels
         [ObservableProperty]
         private MinValueGarmentIDWithSelectedGroup selectedMinValueGarmentIDWithSelectedGroup;
 
+        [ObservableProperty]
+        private int currentConventionalUnitValue;
 
         [ObservableProperty]
         private string displayMinValueGarmentName;
@@ -90,27 +94,38 @@ namespace OrderonTailoringCostCalculation.ViewModels
                 return;
             }
         }
+
+        async partial void OnCurrentConventionalUnitValueChanged(int value)
+        {
+            IsComplElementButtonVisable = value != 0 && DisplayMinValueGarmentName is not null ? true : false;
+            if(CurrentReceipt != null)
+            {
+                CurrentReceipt.ConventionalUnitValue = value;
+            }
+        }
+
         async partial void OnSelectedMinValueGarmentIDWithSelectedGroupChanged(MinValueGarmentIDWithSelectedGroup value)
         {
             if (value != null)
             {
                 try
                 {
-                    if (CurrentReceipt != null)
-                    {
-                        CurrentReceipt.MinValueGarmentID = value.MinValueGarmentID;
-                        CurrentReceipt.MaterialGroupID = value.SelectedGroup;
-                        await SaveReceipt();
-                    }
-                    else
+                    if (CurrentReceipt == null)
                     {
                         CurrentReceipt = new Receipt();
-                        CurrentReceipt.MinValueGarmentID = value.MinValueGarmentID;
-                        CurrentReceipt.MaterialGroupID = value.SelectedGroup;
-                        await SaveReceipt();
                     }
+                    CurrentReceipt.MinValueGarmentID = value.MinValueGarmentID;
+                    CurrentReceipt.MaterialGroupID = value.SelectedGroup;
+                    CurrentReceipt.ConventionalUnitValue = value.ConventionalUnitValue;
+                    MinValueGarment currentMinValueGarment = await _minValueGarmentService.GetItemAsync(value.MinValueGarmentID);
+                    DisplayMinValueGarmentName = currentMinValueGarment.Name;
+                    CurrentConventionalUnitValue = value.ConventionalUnitValue;
+                    OnCurrentConventionalUnitValueChanged(value.ConventionalUnitValue);
+                    await SaveReceipt();
+
                     SelectedMinValueGarmentIDWithSelectedGroup.MinValueGarmentID = 0;
                     selectedMinValueGarmentIDWithSelectedGroup.SelectedGroup = 0;
+                    selectedMinValueGarmentIDWithSelectedGroup.ConventionalUnitValue = 0;
                 }
                 catch (Exception ex)
                 {
@@ -173,92 +188,101 @@ namespace OrderonTailoringCostCalculation.ViewModels
             {
                 CurrentReceipt = ReceiptDetails.Receipt;
                 DisplayMinValueGarmentName = ReceiptDetails.MinValueGarment?.Name;
-                IsComplElementButtonVisable = CurrentReceipt.MinValueGarmentID == 0 ? false : true;
 
+                CurrentConventionalUnitValue = CurrentReceipt.ConventionalUnitValue;
             }
         }
-
 
         [RelayCommand]
         public async Task SaveReceipt()
         {
             if (CurrentReceipt != null)
             {
-                ReceiptID = await _receiptService.SaveItemAsync(CurrentReceipt);
-                await LoadReceiptAsync(ReceiptID);
-                if (ReceiptDetails != null)
+                if (CurrentConventionalUnitValue != 0 && CurrentReceipt.MinValueGarmentID != 0)
                 {
-                    CurrentReceipt.ConventionalUnitValue = 300;
-
-                    CurrentReceipt.DiscountValue = 0;
-
-                    Multiplier multiplier = await _multiplierService.GetItemAsync(ReceiptDetails.MinValueGarment.MultiplierID); 
-
-                    switch (CurrentReceipt.MaterialGroupID)
-                    {
-                        case 1:
-                            {
-                                CurrentReceipt.MinValue = (ReceiptDetails.MinValueGarment.RatioFirst * multiplier.FirstGroup) * CurrentReceipt.ConventionalUnitValue;
-                                CurrentReceipt.DiscountValue -= 20;
-                                
-                            }
-                            break;
-                        case 2:
-                            {
-                                CurrentReceipt.MinValue = (ReceiptDetails.MinValueGarment.RatioFirst * multiplier.FirstGroup) * CurrentReceipt.ConventionalUnitValue;
-                            }
-                            break;
-                        case 3:
-                            {
-                                CurrentReceipt.MinValue = (ReceiptDetails.MinValueGarment.RatioSecond * multiplier.SecondGroup) * CurrentReceipt.ConventionalUnitValue;
-                            }
-                            break;
-                        case 4:
-                            {
-                                CurrentReceipt.MinValue = (ReceiptDetails.MinValueGarment.RatioThird * multiplier.ThirdGroup) * CurrentReceipt.ConventionalUnitValue;
-                            }
-                            break;
-                        case 5:
-                            {
-                                CurrentReceipt.MinValue = (ReceiptDetails.MinValueGarment.RatioFourth * multiplier.FourthGroup) * CurrentReceipt.ConventionalUnitValue;
-                            }
-                            break;
-                    }
-
-                    List<ReceiptComplicatedElement> receiptComplicatedElements = await _receiptComplicatedElementService.GetItemsAsync(ReceiptID);
-                    if (receiptComplicatedElements != null)
-                    {
-                        ComplicatedElements.Clear();
-                        CurrentReceipt.ComplicatedElementsValue = 0;
-                        foreach (var element in receiptComplicatedElements)
-                        {
-                            ComplicatedElement complicatedElement = await _complicatedElementService.GetItemAsync(element.ComplicatedElementID);
-                            ComplicatedElements.Add(complicatedElement);
-                            CurrentReceipt.ComplicatedElementsValue += complicatedElement.Merit * element.Count;
-                        }
-                        CurrentReceipt.ComplicatedElementsValue = CurrentReceipt.ComplicatedElementsValue * CurrentReceipt.ConventionalUnitValue;
-                    }
-
-                    CurrentReceipt.TotalValue = CurrentReceipt.MinValue + CurrentReceipt.ComplicatedElementsValue;
-
-                    List<ReceiptDiscount> receiptDiscounts = await _receiptDiscountService.GetItemsAsync(ReceiptID);
-                    if (receiptDiscounts != null)
-                    {
-                        foreach(var discount in receiptDiscounts)
-                        {
-                            var currentDiscount = await _discountService.GetItemAsync(discount.DiscountID);
-                            CurrentReceipt.DiscountValue += currentDiscount.Merit;
-                        }
-                    }
-                    if(CurrentReceipt.DiscountValue != 0)
-                    {
-                        CurrentReceipt.DiscountValue = ((CurrentReceipt.DiscountValue * -1) * CurrentReceipt.TotalValue) / 100;
-                    }
-
-                    CurrentReceipt.TotalValue += CurrentReceipt.DiscountValue;
-
                     ReceiptID = await _receiptService.SaveItemAsync(CurrentReceipt);
-                    await LoadReceiptAsync(ReceiptID);
+                    //await LoadReceiptAsync(ReceiptID);
+                    CurrentReceipt.ConventionalUnitValue = CurrentConventionalUnitValue;
+                    if (ReceiptDetails != null)
+                    {
+                        CurrentReceipt.DiscountValue = 0;
+
+                        Multiplier multiplier = await _multiplierService.GetItemAsync(ReceiptDetails.MinValueGarment.MultiplierID);
+
+                        double currentCoefficient = 0;
+
+                        switch (CurrentReceipt.MaterialGroupID)
+                        {
+                            case 1:
+                                {
+                                    currentCoefficient = multiplier.FirstGroup;
+                                    CurrentReceipt.MinValue = (ReceiptDetails.MinValueGarment.RatioFirst * multiplier.FirstGroup) * CurrentReceipt.ConventionalUnitValue;
+                                    CurrentReceipt.DiscountValue -= 20;
+                                }
+                                break;
+                            case 2:
+                                {
+                                    currentCoefficient = multiplier.FirstGroup;
+                                    CurrentReceipt.MinValue = (ReceiptDetails.MinValueGarment.RatioFirst * multiplier.FirstGroup) * CurrentReceipt.ConventionalUnitValue;
+                                }
+                                break;
+                            case 3:
+                                {
+                                    currentCoefficient = multiplier.SecondGroup;
+                                    CurrentReceipt.MinValue = (ReceiptDetails.MinValueGarment.RatioSecond * multiplier.SecondGroup) * CurrentReceipt.ConventionalUnitValue;
+                                }
+                                break;
+                            case 4:
+                                {
+                                    currentCoefficient = multiplier.ThirdGroup;
+                                    CurrentReceipt.MinValue = (ReceiptDetails.MinValueGarment.RatioThird * multiplier.ThirdGroup) * CurrentReceipt.ConventionalUnitValue;
+                                }
+                                break;
+                            case 5:
+                                {
+                                    currentCoefficient = multiplier.FourthGroup;
+                                    CurrentReceipt.MinValue = (ReceiptDetails.MinValueGarment.RatioFourth * multiplier.FourthGroup) * CurrentReceipt.ConventionalUnitValue;
+                                }
+                                break;
+                        }
+
+
+                        await _receiptComplicatedElementService.GetItemsAsync(ReceiptID);
+                        if (_receiptComplicatedElementService.ReceiptComplicatedElements != null)
+                        {
+                            ComplicatedElements.Clear();
+                            CurrentReceipt.ComplicatedElementsValue = 0;
+                            double complicatedElementsCount = 0;
+                            foreach (var element in _receiptComplicatedElementService.ReceiptComplicatedElements)
+                            {
+                                ComplicatedElement complicatedElement = await _complicatedElementService.GetItemAsync(element.ComplicatedElementID);
+                                ComplicatedElements.Add(complicatedElement);
+                                complicatedElementsCount += complicatedElement.Merit;
+                            }
+                            CurrentReceipt.ComplicatedElementsValue = ((complicatedElementsCount * currentCoefficient) * CurrentReceipt.ConventionalUnitValue);
+                        }
+
+                        CurrentReceipt.TotalValue = CurrentReceipt.MinValue + CurrentReceipt.ComplicatedElementsValue;
+
+                        List<ReceiptDiscount> receiptDiscounts = await _receiptDiscountService.GetItemsAsync(ReceiptID);
+                        if (receiptDiscounts != null)
+                        {
+                            foreach (var discount in receiptDiscounts)
+                            {
+                                var currentDiscount = await _discountService.GetItemAsync(discount.DiscountID);
+                                CurrentReceipt.DiscountValue += currentDiscount.Merit;
+                            }
+                        }
+                        if (CurrentReceipt.DiscountValue != 0)
+                        {
+                            CurrentReceipt.DiscountValue = ((CurrentReceipt.DiscountValue * -1) * CurrentReceipt.TotalValue) / 100;
+                        }
+
+                        CurrentReceipt.TotalValue += CurrentReceipt.DiscountValue;
+
+                        ReceiptID = await _receiptService.SaveItemAsync(CurrentReceipt);
+                        await LoadReceiptAsync(ReceiptID);
+                    }
                 }
             }
         }
@@ -284,7 +308,11 @@ namespace OrderonTailoringCostCalculation.ViewModels
         [RelayCommand]
         private async Task GoToGarments()
         {
-            await _navigationService.GoToAsync("MinValueGarmentsPage");
+            var parameters = new Dictionary<string, object>
+            {
+                ["currentConventionalUnitValue"] = CurrentConventionalUnitValue
+            };
+            await _navigationService.GoToAsync("MinValueGarmentsPage", parameters);
         }
 
         [RelayCommand]

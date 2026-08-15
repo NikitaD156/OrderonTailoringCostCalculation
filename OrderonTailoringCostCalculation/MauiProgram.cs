@@ -21,8 +21,6 @@ namespace OrderonTailoringCostCalculation
             builder.Services.AddSingleton<INavigationService, MauiNavigationService>();
             builder.Services.AddSingleton<IDialogService, MauiDialogService>();
 
-            builder.Services.AddTransient<ReceiptService>();
-
             builder.Services.AddTransient<MainPage>();
             builder.Services.AddTransient<ReceiptsViewModel>();
             builder.Services.AddTransient<ReceiptListItemViewModel>();

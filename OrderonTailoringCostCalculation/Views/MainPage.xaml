@@ -19,7 +19,7 @@
         </StackLayout>
         <CollectionView Grid.Row="1" ItemsSource="{Binding Receipts}" SelectedItem="{Binding SelectedReceipt, Mode=TwoWay}" SelectionMode="Single">
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="viewModels: ReceiptListItemViewModel">
+                <DataTemplate x:DataType="viewModels:ReceiptListItemViewModel">
                     <Grid>
                         <Border>
                             <StackLayout Orientation="Vertical">

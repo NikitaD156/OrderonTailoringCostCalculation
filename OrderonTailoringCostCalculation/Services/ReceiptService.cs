@@ -2,6 +2,7 @@
 using SQLite;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace OrderonTailoringCostCalculation.Services
@@ -62,15 +63,31 @@ namespace OrderonTailoringCostCalculation.Services
 
         public async Task<int> SaveItemAsync(Receipt item)
         {
+            //await Init();
+            //if (item.ID != 0)
+            //{
+            //    await database.UpdateAsync(item);
+            //    return item.ID;
+            //}
+            //else
+            //{
+            //    await database.InsertAsync(item);
+            //    return item.ID;
+            //}
             await Init();
+            Debug.WriteLine($"\n[{DateTime.Now:HH:mm:ss.fff}] SaveItemAsync ENTER | item.ID={item.ID} | Hash={item.GetHashCode()}\n{Environment.StackTrace}\n");
             if (item.ID != 0)
             {
-                await database.UpdateAsync(item);
+                Debug.WriteLine("-> UpdateAsync");
+                int updated = await database.UpdateAsync(item);
+                Debug.WriteLine($"<- UpdateAsync вернул {updated}");
                 return item.ID;
             }
             else
             {
-                await database.InsertAsync(item);
+                Debug.WriteLine("-> InsertAsync");
+                int inserted = await database.InsertAsync(item);
+                Debug.WriteLine($"<- InsertAsync вернул {inserted}, теперь item.ID={item.ID}");
                 return item.ID;
             }
         }

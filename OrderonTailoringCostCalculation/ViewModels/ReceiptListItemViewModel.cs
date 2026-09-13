@@ -26,11 +26,23 @@ namespace OrderonTailoringCostCalculation.ViewModels
         [ObservableProperty]
         private string displayMinValueGarmentName;
 
+        [ObservableProperty]
+        private string displayDiscountPercentage;
+
         public ReceiptListItemViewModel(Receipt receipt, string minValueGarmentName)
         {
             _receipt = receipt;
 
             DisplayMinValueGarmentName = minValueGarmentName;
+        }
+
+        public ReceiptListItemViewModel(Receipt receipt, string minValueGarmentName, string discountPercentage)
+        {
+            _receipt = receipt;
+
+            DisplayMinValueGarmentName = minValueGarmentName;
+
+            DisplayDiscountPercentage = discountPercentage;
         }
     }
 }

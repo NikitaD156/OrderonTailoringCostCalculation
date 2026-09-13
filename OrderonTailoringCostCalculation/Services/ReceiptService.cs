@@ -20,6 +20,9 @@ namespace OrderonTailoringCostCalculation.Services
             await DataBaseInitializer.CopyDatabaseIfNotExistsAsync(Constants.DatabaseFilename);
 
             database = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
+
+            await database.ExecuteAsync("PRAGMA foreign_keys = ON;");
+
             var result = await database.CreateTableAsync<Receipt>();
         }
 
@@ -97,6 +100,5 @@ namespace OrderonTailoringCostCalculation.Services
             await Init();
             return await database.DeleteAsync(item);
         }
-
     }
 }

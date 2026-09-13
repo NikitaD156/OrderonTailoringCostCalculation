@@ -23,6 +23,12 @@ namespace OrderonTailoringCostCalculation.ViewModels
         [ObservableProperty]
         private ReceiptListItemViewModel selectedReceipt;
 
+        [ObservableProperty]
+        private bool isReceiptEditingButtonsVisable = false;
+
+        [ObservableProperty]
+        private Receipt deletingReceipt;
+
         public ReceiptsViewModel(INavigationService navigationService, IDialogService dialogService)
         {
             receiptService = new ReceiptService();
@@ -40,7 +46,30 @@ namespace OrderonTailoringCostCalculation.ViewModels
             foreach (var receipt in receiptService.Receipts)
             {
                 MinValueGarment minValueGarment =  await minValueGarmentService.GetItemAsync(receipt.MinValueGarmentID);
-                Receipts.Add(new ReceiptListItemViewModel(receipt, minValueGarment.Name));
+                int discountPercentageValue = (int)((-100 * receipt.DiscountValue) / (receipt.TotalValue + (receipt.DiscountValue * - 1)));
+                string discountPercentage = discountPercentageValue >= 0? "Скидка: " + discountPercentageValue.ToString() : "Надбавка: " + (discountPercentageValue * -1).ToString();
+                Receipts.Add(new ReceiptListItemViewModel(receipt, minValueGarment.Name, discountPercentage));
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectedReceiptChanged(ReceiptListItemViewModel selectedReceipt)
+        {
+            IsReceiptEditingButtonsVisable = selectedReceipt != null ? true : false;
+        }
+
+        [RelayCommand]
+        private async Task DeleteSelectedReceipt(ReceiptListItemViewModel selectedReceipt)
+        {
+            if (selectedReceipt != null)
+            {
+                DeletingReceipt = await receiptService.GetItemAsync(selectedReceipt.id);
+                await receiptService.DeleteItemAsync(DeletingReceipt);
+                await LoadAsync();
+            }
+            else
+            {
+                return;
             }
         }
 

@@ -30,6 +30,12 @@ namespace OrderonTailoringCostCalculation.Services
             return _receiptComplicatedElements = await database.Table<ReceiptComplicatedElement>().Where(i => i.ReceiptID == receiptID).ToListAsync();
         }
 
+        public async Task<ReceiptComplicatedElement> GetItemAsync(int elementID)
+        {
+            await Init();
+            return await database.Table<ReceiptComplicatedElement>().Where(i => i.ComplicatedElementID == elementID).FirstOrDefaultAsync();
+        }
+
         public async Task<int> SaveItemAsync(ReceiptComplicatedElement item)
         {
             await Init();
@@ -49,5 +55,6 @@ namespace OrderonTailoringCostCalculation.Services
             await Init();
             return await database.DeleteAsync(item);
         }
+
     }
 }

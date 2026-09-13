@@ -31,6 +31,12 @@ namespace OrderonTailoringCostCalculation.Services
             return _receiptDiscount = await database.Table<ReceiptDiscount>().Where(i => i.ReceiptID == receiptID).ToListAsync();
         }
 
+        public async Task<ReceiptDiscount> GetItemAsync(int discountID)
+        {
+            await Init();
+            return await database.Table<ReceiptDiscount>().Where(i => i.DiscountID == discountID).FirstOrDefaultAsync();
+        }
+
         public async Task<int> SaveItemAsync(ReceiptDiscount item)
         {
             await Init();

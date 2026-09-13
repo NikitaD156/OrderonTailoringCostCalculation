@@ -71,6 +71,18 @@ namespace OrderonTailoringCostCalculation.ViewModels
 
         private int _isSaving = 0;
 
+        [ObservableProperty]
+        private ComplicatedElement selectedComplicatedElement;
+
+        [ObservableProperty]
+        private ReceiptComplicatedElement selectedReceiptComplicatedElement;
+
+        [ObservableProperty]
+        private Discount selectedDiscount;
+
+        [ObservableProperty]
+        private ReceiptDiscount selectedReceiptDiscount;
+
         public record MaterialSelectedMessage(int garmentID, int materialID);
         
         public ReceiptDetailsViewModel(INavigationService navigationService, IDialogService dialogService)
@@ -272,18 +284,20 @@ namespace OrderonTailoringCostCalculation.ViewModels
 
                             CurrentReceipt.TotalValue = CurrentReceipt.MinValue + CurrentReceipt.ComplicatedElementsValue;
 
-                            List<ReceiptDiscount> receiptDiscounts = await _receiptDiscountService.GetItemsAsync(ReceiptID);
-                            if (receiptDiscounts != null)
+
+                            await _receiptDiscountService.GetItemsAsync(ReceiptID);
+                            if (_receiptDiscountService.ReceiptDiscounts != null)
                             {
-                                foreach (var discount in receiptDiscounts)
+                                Discounts.Clear();
+                                CurrentReceipt.DiscountValue = 0;
+                                int discountsMerit = 0;
+                                foreach (var element in _receiptDiscountService.ReceiptDiscounts)
                                 {
-                                    var currentDiscount = await _discountService.GetItemAsync(discount.DiscountID);
-                                    CurrentReceipt.DiscountValue += currentDiscount.Merit;
+                                    Discount discount = await _discountService.GetItemAsync(element.DiscountID);
+                                    Discounts.Add(discount);
+                                    discountsMerit += discount.Merit;
                                 }
-                            }
-                            if (CurrentReceipt.DiscountValue != 0)
-                            {
-                                CurrentReceipt.DiscountValue = ((CurrentReceipt.DiscountValue * -1) * CurrentReceipt.TotalValue) / 100;
+                                CurrentReceipt.DiscountValue = (discountsMerit * CurrentReceipt.TotalValue) / 100;
                             }
 
                             CurrentReceipt.TotalValue += CurrentReceipt.DiscountValue;
@@ -318,6 +332,36 @@ namespace OrderonTailoringCostCalculation.ViewModels
         {
             await SaveReceipt();
             await _navigationService.GoToRootAsync();
+        }
+
+        [RelayCommand]
+        private async Task DeleteComplicatedElement(ComplicatedElement selectedComplicatedElement)
+        {
+            if (selectedComplicatedElement != null)
+            {
+                SelectedReceiptComplicatedElement = await _receiptComplicatedElementService.GetItemAsync(selectedComplicatedElement.ID);
+                await _receiptComplicatedElementService.DeleteItemAsync(SelectedReceiptComplicatedElement);
+                await SaveReceipt();
+            }
+            else
+            {
+                await _dialogService.ShowAlertAsync("Текущий элемент", "selectedComplicatedElement == null", "ОК");
+            }
+        }
+
+        [RelayCommand]
+        private async Task DeleteDiscount(Discount selectedDiscount)
+        {
+            if (selectedDiscount != null)
+            {
+                SelectedReceiptDiscount = await _receiptDiscountService.GetItemAsync(selectedDiscount.ID);
+                await _receiptDiscountService.DeleteItemAsync(SelectedReceiptDiscount);
+                await SaveReceipt();
+            }
+            else
+            {
+                await _dialogService.ShowAlertAsync("Текущий элемент", "selectedDiscount == null", "ОК");
+            }
         }
 
         [RelayCommand]

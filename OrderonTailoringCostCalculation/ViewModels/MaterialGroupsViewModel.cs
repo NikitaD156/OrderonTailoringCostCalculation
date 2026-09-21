@@ -41,13 +41,11 @@ namespace OrderonTailoringCostCalculation.ViewModels
         {
             if (value != null)
             {
-                MinValueGarmentIDWithSelectedGroup minValueGarmentIDWithSelectedGroup = new();
-                minValueGarmentIDWithSelectedGroup.MinValueGarmentID = SelectedMinValueGarmentID;
-                minValueGarmentIDWithSelectedGroup.SelectedGroup = value.ID;
-                minValueGarmentIDWithSelectedGroup.ConventionalUnitValue = CurrentConventionalUnitValue;
                 var parameters = new Dictionary<string, object>
                 {
-                    ["garmentIDandGroup"] = minValueGarmentIDWithSelectedGroup
+                    ["minValueGarmentID"] = SelectedMinValueGarmentID,
+                    ["selectedGroup"] = value.ID,
+                    ["currentConventionalUnitValue"] = CurrentConventionalUnitValue
                 };
                 await _navigationService.GoToAsync("../..", parameters);
             }

@@ -6,18 +6,25 @@
              xmlns:viewModels="clr-namespace:OrderonTailoringCostCalculation.ViewModels"
              x:DataType="viewModels:ComplicatedElementsViewModel"
              Title="Выберите усложняющий элемент">
-    <CollectionView ItemsSource="{Binding ComplicatedElements}" SelectionChangedCommand="{Binding SelectedElementChangedCommand}" SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}" SelectedItem="{Binding SelectedComplicatedElement, Mode=TwoWay}" SelectionMode="Single">
-        <CollectionView.ItemTemplate>
-            <DataTemplate x:DataType="models:ComplicatedElement">
-                <Grid>
-                    <Border>
-                        <StackLayout>
-                            <Label Text="{Binding Name}"/>
-                            <Label Text="{Binding Description}"/>
-                        </StackLayout>
-                    </Border>
-                </Grid>
-            </DataTemplate>
-        </CollectionView.ItemTemplate>
-    </CollectionView>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <SearchBar Placeholder="Поиск усложняющих элементов" Text="{Binding SearchText, Mode=TwoWay}" SearchCommand="{Binding SearchElementCommand}"/>
+        <CollectionView Grid.Row="1" ItemsSource="{Binding ComplicatedElements}" SelectionChangedCommand="{Binding SelectedElementChangedCommand}" SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}" SelectedItem="{Binding SelectedComplicatedElement, Mode=TwoWay}" SelectionMode="Single">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:ComplicatedElement">
+                    <Grid>
+                        <Border>
+                            <StackLayout>
+                                <Label Text="{Binding Name}"/>
+                                <Label Text="{Binding Description}"/>
+                            </StackLayout>
+                        </Border>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
 </ContentPage>

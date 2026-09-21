@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 namespace OrderonTailoringCostCalculation.ViewModels
 {
     [QueryProperty(nameof(ReceiptID), "receiptID")]
+    [QueryProperty(nameof(MultiplierID), "multiplierID")]
     public partial class ComplicatedElementsViewModel : ObservableObject
     {
         private readonly INavigationService _navigationService;
@@ -27,7 +28,13 @@ namespace OrderonTailoringCostCalculation.ViewModels
         private int receiptID;
 
         [ObservableProperty]
+        private int multiplierID;
+
+        [ObservableProperty]
         private ComplicatedElement selectedComplicatedElement;
+
+        [ObservableProperty]
+        private string searchText;
 
         public ComplicatedElementsViewModel(INavigationService navigationService, IDialogService dialogService)
         {
@@ -36,6 +43,22 @@ namespace OrderonTailoringCostCalculation.ViewModels
             complicatedElements = new ObservableCollection<ComplicatedElement>();
             _navigationService = navigationService;
             _dialogService = dialogService;
+        }
+
+        async partial void OnReceiptIDChanged(int value)
+        {
+            if(value != 0)
+            {
+                await LoadAsync();
+            }
+        }
+
+        async partial void OnMultiplierIDChanged(int value)
+        {
+            if(value != 0)
+            {
+                await LoadAsync();
+            }
         }
 
         [RelayCommand]
@@ -71,14 +94,42 @@ namespace OrderonTailoringCostCalculation.ViewModels
             }
         }
 
+        async partial void OnSearchTextChanged(string value)
+        {
+            if(value != null)
+            {
+                await SearchElement();
+            }
+        }
+
         [RelayCommand]
-        public async Task LoadAsync()
+        public async Task SearchElement()
         {
             await _complicatedElementService.GetItemsAsync();
             ComplicatedElements.Clear();
             foreach (var complicatedElement in _complicatedElementService.ComplicatedElements)
             {
-                ComplicatedElements.Add(complicatedElement);
+                if (complicatedElement.Name.ToLower().Contains(SearchText.ToLower()) || complicatedElement.Description.ToLower().Contains(SearchText.ToLower()))
+                {
+                    ComplicatedElements.Add(complicatedElement);
+                }
+            }
+        }
+
+        [RelayCommand]
+        public async Task LoadAsync()
+        {
+            if (ReceiptID != 0 && MultiplierID != 0)
+            {
+                await _complicatedElementService.GetItemsAsync();
+                ComplicatedElements.Clear();
+                foreach (var complicatedElement in _complicatedElementService.ComplicatedElements)
+                {
+                    if (MultiplierID == complicatedElement.MultiplierID)
+                    {
+                        ComplicatedElements.Add(complicatedElement);
+                    }
+                }
             }
         }
     }

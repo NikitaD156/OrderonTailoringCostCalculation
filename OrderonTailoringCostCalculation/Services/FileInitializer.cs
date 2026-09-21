@@ -4,15 +4,15 @@ using System.Text;
 
 namespace OrderonTailoringCostCalculation.Services
 {
-    public static class DataBaseInitializer
+    public static class FileInitializer
     {
-        public static async Task CopyDatabaseIfNotExistsAsync(string databaseFileName)
+        public static async Task CopyFileIfNotExistsAsync(string fileName)
         {
-            string targetPath = Path.Combine(FileSystem.AppDataDirectory, databaseFileName);
+            string targetPath = Path.Combine(FileSystem.AppDataDirectory, fileName);
 
             if (!File.Exists(targetPath))
             {
-                using Stream sourceStream = await FileSystem.OpenAppPackageFileAsync(databaseFileName);
+                using Stream sourceStream = await FileSystem.OpenAppPackageFileAsync(fileName);
                 using FileStream destinationStream = File.Create(targetPath);
                 await sourceStream.CopyToAsync(destinationStream);
             }

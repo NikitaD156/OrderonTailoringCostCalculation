@@ -11,6 +11,7 @@ namespace OrderonTailoringCostCalculation.Models
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
         public int SubgroupID { get; set; }
+        public int MultiplierID { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public double Merit { get; set; }

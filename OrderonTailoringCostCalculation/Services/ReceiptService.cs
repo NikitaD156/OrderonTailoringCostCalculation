@@ -17,7 +17,7 @@ namespace OrderonTailoringCostCalculation.Services
             {
                 return;
             }
-            await DataBaseInitializer.CopyDatabaseIfNotExistsAsync(Constants.DatabaseFilename);
+            await FileInitializer.CopyFileIfNotExistsAsync(Constants.DatabaseFilename);
 
             database = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
 

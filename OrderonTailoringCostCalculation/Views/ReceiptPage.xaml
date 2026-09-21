@@ -101,6 +101,8 @@
                 </CollectionView>
 
                 <Button Text="Сохранить" Command="{Binding SaveAndExitCommand}" IsVisible="{Binding IsComplElementButtonVisable}"/>
+
+                <Button Text="Создать документ" Command="{Binding WriteReceiptCommand}" IsVisible="{Binding IsComplElementButtonVisable}"/>
             </StackLayout>
         </ScrollView>
     </Grid>

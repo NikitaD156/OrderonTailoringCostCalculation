@@ -18,5 +18,12 @@ namespace OrderonTailoringCostCalculation
 
         public static string DatabasePath =>
             Path.Combine(FileSystem.AppDataDirectory, DatabaseFilename);
+
+
+
+        public const string MaterialsTemplateName = "MaterialsTemplate.docx";
+
+        public static string MaterialsTemplate => 
+            Path.Combine(FileSystem.AppDataDirectory, MaterialsTemplateName);
     }
 }

@@ -352,8 +352,19 @@ namespace OrderonTailoringCostCalculation.ViewModels
         {
             if (CurrentReceipt != null)
             {
-                string receiptDocxName = await _receiptWriteService.WriteReceipt(CurrentReceipt);
-                await _dialogService.ShowAlertAsync("Чек создан", "Чек сохранён в: " + Directory.GetCurrentDirectory() + "\nИмя чека: " + receiptDocxName, "OK");
+                string receiptDocxFilePath = await _receiptWriteService.WriteReceipt(CurrentReceipt);
+                if (receiptDocxFilePath != null)
+                {
+                    bool b = await _dialogService.ShowAlertAsync("Файл сохранён", "Хотите поделится чеком?", "Да", "Нет");
+                    if (b)
+                    {
+                        await Share.Default.RequestAsync(new ShareFileRequest
+                        {
+                            Title = "Поделиться документом",
+                            File = new ShareFile(receiptDocxFilePath)
+                        });
+                    }
+                }
             }
         }
 

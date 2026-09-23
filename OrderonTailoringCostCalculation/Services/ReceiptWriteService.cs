@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Storage;
+using CommunityToolkit.Mvvm.ComponentModel;
 using DocxTemplater;
 using OrderonTailoringCostCalculation.Models;
 using OrderonTailoringCostCalculation.Services;
@@ -38,9 +39,20 @@ namespace OrderonTailoringCostCalculation.Services
             template.BindModel("tv", new { Total = receipt.TotalValue});
             template.BindModel("ce", new { ceTotal = receipt.ComplicatedElementsValue });
             template.BindModel("pc", new { Percent = receipt.DiscountValue });
-            string currentReceiptName = "Чек_1";
-            template.Save(currentReceiptName + ".docx");
-            return currentReceiptName;
+
+            string currentReceiptName = "Чек_1" + ".docx";
+            string filePath = Path.Combine(FileSystem.AppDataDirectory, currentReceiptName);
+
+            template.Save(filePath);
+
+            using var fileStream = File.OpenRead(filePath);
+
+            var fileSaverResult = await FileSaver.Default.SaveAsync(
+            currentReceiptName,
+            fileStream,
+            CancellationToken.None);
+
+            return filePath;
         }
     }
 }

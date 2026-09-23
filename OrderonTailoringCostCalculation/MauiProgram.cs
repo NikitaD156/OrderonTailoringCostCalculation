@@ -2,6 +2,7 @@
 using OrderonTailoringCostCalculation.Services;
 using OrderonTailoringCostCalculation.ViewModels;
 using OrderonTailoringCostCalculation.Views;
+using CommunityToolkit.Maui;
 
 namespace OrderonTailoringCostCalculation
 {
@@ -12,6 +13,7 @@ namespace OrderonTailoringCostCalculation
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

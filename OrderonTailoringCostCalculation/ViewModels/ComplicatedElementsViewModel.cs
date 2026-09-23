@@ -82,15 +82,7 @@ namespace OrderonTailoringCostCalculation.ViewModels
             }
             else
             {
-                bool b = await _dialogService.ShowAlertAsync("Количество Элементов = 0", "Да", "Вернутся к выбору элемента?", "Нет");
-                if (b)
-                {
-                    await _navigationService.GoBackAsync();
-                }
-                else
-                {
-                    return;
-                }
+                return;
             }
         }
 

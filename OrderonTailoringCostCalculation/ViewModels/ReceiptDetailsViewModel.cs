@@ -65,6 +65,9 @@ namespace OrderonTailoringCostCalculation.ViewModels
         private int selectedGroup;
 
         [ObservableProperty]
+        private MinValueGarment currentMinValueGarment;
+
+        [ObservableProperty]
         private int currentConventionalUnitValue;
 
         [ObservableProperty]
@@ -140,8 +143,6 @@ namespace OrderonTailoringCostCalculation.ViewModels
             await SaveReceipt();
         }
 
-        
-
         async partial void OnComplicatedElementSavedChanged(bool value)
         {
             if (value)
@@ -197,8 +198,8 @@ namespace OrderonTailoringCostCalculation.ViewModels
                     }
                     CurrentReceipt.MinValueGarmentID = SelectedMinValueGarmentID;
                     CurrentReceipt.MaterialGroupID = SelectedGroup;
-                    MinValueGarment currentMinValueGarment = await _minValueGarmentService.GetItemAsync(SelectedMinValueGarmentID);
-                    DisplayMinValueGarmentName = currentMinValueGarment.Name;
+                    CurrentMinValueGarment = await _minValueGarmentService.GetItemAsync(SelectedMinValueGarmentID);
+                    DisplayMinValueGarmentName = CurrentMinValueGarment.Name;
                     await SaveReceipt();
                     IsComplElementButtonVisable = CurrentConventionalUnitValue != 0 ? true : false;
                 }
@@ -221,6 +222,9 @@ namespace OrderonTailoringCostCalculation.ViewModels
             if (ReceiptDetails != null && CurrentReceipt == null)
             {
                 CurrentReceipt = ReceiptDetails.Receipt;
+
+                CurrentMinValueGarment = ReceiptDetails.MinValueGarment;
+
                 DisplayMinValueGarmentName = ReceiptDetails.MinValueGarment?.Name;
 
                 CurrentConventionalUnitValue = CurrentReceipt.ConventionalUnitValue;
@@ -244,11 +248,11 @@ namespace OrderonTailoringCostCalculation.ViewModels
                     {
                         ReceiptID = await _receiptService.SaveItemAsync(CurrentReceipt);
                         CurrentReceipt.ConventionalUnitValue = CurrentConventionalUnitValue;
-                        if (ReceiptDetails != null)
+                        if (CurrentMinValueGarment != null)
                         {
                             CurrentReceipt.DiscountValue = 0;
 
-                            CurrentMultiplier = await _multiplierService.GetItemAsync(ReceiptDetails.MinValueGarment.MultiplierID);
+                            CurrentMultiplier = await _multiplierService.GetItemAsync(CurrentMinValueGarment.MultiplierID);
 
                             double currentCoefficient = 0;
 
@@ -257,32 +261,32 @@ namespace OrderonTailoringCostCalculation.ViewModels
                                 case 1:
                                     {
                                         currentCoefficient = CurrentMultiplier.FirstGroup;
-                                        CurrentReceipt.MinValue = ReceiptDetails.MinValueGarment.RatioFirst * CurrentReceipt.ConventionalUnitValue;
+                                        CurrentReceipt.MinValue = CurrentMinValueGarment.RatioFirst * CurrentReceipt.ConventionalUnitValue;
                                         CurrentReceipt.DiscountValue -= 20;
                                     }
                                     break;
                                 case 2:
                                     {
                                         currentCoefficient = CurrentMultiplier.FirstGroup;
-                                        CurrentReceipt.MinValue = ReceiptDetails.MinValueGarment.RatioFirst * CurrentReceipt.ConventionalUnitValue;
+                                        CurrentReceipt.MinValue = CurrentMinValueGarment.RatioFirst * CurrentReceipt.ConventionalUnitValue;
                                     }
                                     break;
                                 case 3:
                                     {
                                         currentCoefficient = CurrentMultiplier.SecondGroup;
-                                        CurrentReceipt.MinValue = ReceiptDetails.MinValueGarment.RatioSecond * CurrentReceipt.ConventionalUnitValue;
+                                        CurrentReceipt.MinValue = CurrentMinValueGarment.RatioSecond * CurrentReceipt.ConventionalUnitValue;
                                     }
                                     break;
                                 case 4:
                                     {
                                         currentCoefficient = CurrentMultiplier.ThirdGroup;
-                                        CurrentReceipt.MinValue = ReceiptDetails.MinValueGarment.RatioThird * CurrentReceipt.ConventionalUnitValue;
+                                        CurrentReceipt.MinValue = CurrentMinValueGarment.RatioThird * CurrentReceipt.ConventionalUnitValue;
                                     }
                                     break;
                                 case 5:
                                     {
                                         currentCoefficient = CurrentMultiplier.FourthGroup;
-                                        CurrentReceipt.MinValue = ReceiptDetails.MinValueGarment.RatioFourth * CurrentReceipt.ConventionalUnitValue;
+                                        CurrentReceipt.MinValue = CurrentMinValueGarment.RatioFourth * CurrentReceipt.ConventionalUnitValue;
                                     }
                                     break;
                             }
@@ -384,10 +388,6 @@ namespace OrderonTailoringCostCalculation.ViewModels
                 await _receiptComplicatedElementService.DeleteItemAsync(SelectedReceiptComplicatedElement);
                 await SaveReceipt();
             }
-            else
-            {
-                await _dialogService.ShowAlertAsync("Текущий элемент", "selectedComplicatedElement == null", "ОК");
-            }
         }
 
         [RelayCommand]
@@ -398,10 +398,6 @@ namespace OrderonTailoringCostCalculation.ViewModels
                 SelectedReceiptDiscount = await _receiptDiscountService.GetItemAsync(selectedDiscount.ID);
                 await _receiptDiscountService.DeleteItemAsync(SelectedReceiptDiscount);
                 await SaveReceipt();
-            }
-            else
-            {
-                await _dialogService.ShowAlertAsync("Текущий элемент", "selectedDiscount == null", "ОК");
             }
         }
 
@@ -432,11 +428,12 @@ namespace OrderonTailoringCostCalculation.ViewModels
         [RelayCommand]
         private async Task GoToDiscounts()
         {
-            if (CurrentReceipt != null)
+            if (CurrentReceipt != null && CurrentMultiplier != null)
             {
                 var parameters = new Dictionary<string, object>
                 {
-                    ["receiptID"] = CurrentReceipt.ID
+                    ["receiptID"] = CurrentReceipt.ID,
+                    ["multiplierID"] = CurrentMultiplier.ID
                 };
                 await _navigationService.GoToAsync("DiscountsPage", parameters);
             }

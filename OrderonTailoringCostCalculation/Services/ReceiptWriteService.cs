@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Maui.Storage;
+﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DocxTemplater;
 using OrderonTailoringCostCalculation.Models;
@@ -18,6 +19,15 @@ namespace OrderonTailoringCostCalculation.Services
 
         public async Task<string> WriteReceipt(Receipt receipt)
         {
+            var readStatus = await Permissions.RequestAsync<Permissions.StorageRead>();
+            var writeStatus = await Permissions.RequestAsync<Permissions.StorageWrite>();
+
+            if (readStatus != PermissionStatus.Granted || writeStatus != PermissionStatus.Granted)
+            {
+                await Toast.Make("Для сохранения файла необходимо разрешение на запись.").Show();
+                return null;
+            }
+
             await FileInitializer.CopyFileIfNotExistsAsync(Constants.MaterialsTemplateName);
 
             var template = DocxTemplate.Open(Constants.MaterialsTemplate);
@@ -36,11 +46,11 @@ namespace OrderonTailoringCostCalculation.Services
 
             template.BindModel("ds", new { Elements = complicatedElements });
             template.BindModel("mn", new { Value = receipt.MinValue });
-            template.BindModel("tv", new { Total = receipt.TotalValue});
+            template.BindModel("tv", new { Total = receipt.TotalValue });
             template.BindModel("ce", new { ceTotal = receipt.ComplicatedElementsValue });
             template.BindModel("pc", new { Percent = receipt.DiscountValue });
 
-            string currentReceiptName = "Чек_1" + ".docx";
+            string currentReceiptName = "Receipt" + ".docx";
             string filePath = Path.Combine(FileSystem.AppDataDirectory, currentReceiptName);
 
             template.Save(filePath);

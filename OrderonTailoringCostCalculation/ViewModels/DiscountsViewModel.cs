@@ -10,6 +10,7 @@ using System.Text;
 namespace OrderonTailoringCostCalculation.ViewModels
 {
     [QueryProperty(nameof(ReceiptID), "receiptID")]
+    [QueryProperty(nameof(MultiplierID), "multiplierID")]
     public partial class DiscountsViewModel : ObservableObject
     {
         private readonly DiscountService _discountService;
@@ -22,7 +23,13 @@ namespace OrderonTailoringCostCalculation.ViewModels
         private ObservableCollection<Discount> discounts;
 
         [ObservableProperty]
+        private ObservableCollection<ReceiptDiscount> receiptDiscounts;
+
+        [ObservableProperty]
         private int receiptID;
+
+        [ObservableProperty]
+        private int multiplierID;
 
         [ObservableProperty]
         private Discount selectedDiscount;
@@ -32,6 +39,7 @@ namespace OrderonTailoringCostCalculation.ViewModels
             _discountService = new DiscountService();
             _receiptDiscountService = new ReceiptDiscountService();
             discounts = new ObservableCollection<Discount>();
+            receiptDiscounts = new ObservableCollection<ReceiptDiscount>();
             _navigationService = navigationService;
         }
 
@@ -61,7 +69,27 @@ namespace OrderonTailoringCostCalculation.ViewModels
             Discounts.Clear();
             foreach (var discount in _discountService.Discounts)
             {
-                Discounts.Add(discount);
+                bool discountExist = false;
+                await _receiptDiscountService.GetItemsAsync(ReceiptID);
+                foreach (var receiptDiscount in _receiptDiscountService.ReceiptDiscounts)
+                {
+                    if(receiptDiscount.DiscountID == discount.ID)
+                    {
+                        discountExist = true;
+                        break;
+                    }
+                }
+                if (!discountExist && !(discount.Name.Contains("Изделия из материалов 0 группы") || discount.Name.Contains("Установка фурнитуры со стразами")))
+                {
+                    if (discount.MultiplierID == 0)
+                    {
+                        Discounts.Add(discount);
+                    }
+                    else if (MultiplierID == discount.MultiplierID)
+                    {
+                        Discounts.Add(discount);
+                    }
+                }
             }
         }
     }

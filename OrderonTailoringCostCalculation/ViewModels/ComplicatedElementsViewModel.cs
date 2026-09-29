@@ -21,6 +21,8 @@ namespace OrderonTailoringCostCalculation.ViewModels
 
         private readonly ReceiptComplicatedElementService _receiptComplicatedElementService;
 
+        private readonly ReceiptDiscountService _receiptDiscountService;
+
         [ObservableProperty]
         private ObservableCollection<ComplicatedElement> complicatedElements;
 
@@ -40,6 +42,7 @@ namespace OrderonTailoringCostCalculation.ViewModels
         {
             _receiptComplicatedElementService = new ReceiptComplicatedElementService();
             _complicatedElementService = new ComplicatedElementService();
+            _receiptDiscountService = new ReceiptDiscountService();
             complicatedElements = new ObservableCollection<ComplicatedElement>();
             _navigationService = navigationService;
             _dialogService = dialogService;
@@ -66,12 +69,23 @@ namespace OrderonTailoringCostCalculation.ViewModels
         {
             if (value != null)
             {
-                ReceiptComplicatedElement currentReceiptComplicatedElement = new ReceiptComplicatedElement();
-                currentReceiptComplicatedElement.ReceiptID = ReceiptID;
-                currentReceiptComplicatedElement.ComplicatedElementID = value.ID;
+                if (value.Name.Contains("Установка фурнитуры со стразами"))
+                {
+                    ReceiptDiscount currentReceiptDiscount = new ReceiptDiscount();
+                    currentReceiptDiscount.ReceiptID = ReceiptID;
+                    //DiscountID = 14 - это надбавка: "Установка фурнитуры со стразами"
+                    currentReceiptDiscount.DiscountID = 14;
 
-                await _receiptComplicatedElementService.SaveItemAsync(currentReceiptComplicatedElement);
+                    await _receiptDiscountService.SaveItemAsync(currentReceiptDiscount);
+                }
+                else
+                {
+                    ReceiptComplicatedElement currentReceiptComplicatedElement = new ReceiptComplicatedElement();
+                    currentReceiptComplicatedElement.ReceiptID = ReceiptID;
+                    currentReceiptComplicatedElement.ComplicatedElementID = value.ID;
 
+                    await _receiptComplicatedElementService.SaveItemAsync(currentReceiptComplicatedElement);
+                }
                 bool saved = true;
 
                 var parameters = new Dictionary<string, object>
@@ -117,7 +131,11 @@ namespace OrderonTailoringCostCalculation.ViewModels
                 ComplicatedElements.Clear();
                 foreach (var complicatedElement in _complicatedElementService.ComplicatedElements)
                 {
-                    if (MultiplierID == complicatedElement.MultiplierID)
+                    if(complicatedElement.MultiplierID == 0)
+                    {
+                        ComplicatedElements.Add(complicatedElement);
+                    }
+                    else if (MultiplierID == complicatedElement.MultiplierID)
                     {
                         ComplicatedElements.Add(complicatedElement);
                     }

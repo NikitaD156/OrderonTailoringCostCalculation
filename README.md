@@ -72,7 +72,6 @@ OrderonTailoringCostCalculation/
 │   ├── MaterialGroupService.cs
 │   ├── DiscountService.cs
 │   ├── ComplicatedElementService.cs
-│   ├── ReceiptService.cs
 │   ├── MauiDialogService.cs
 │   ├── MauiNavigationService.cs
 │   └── ...
